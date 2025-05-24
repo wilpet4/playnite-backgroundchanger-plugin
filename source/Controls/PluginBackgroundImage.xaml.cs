@@ -10,6 +10,7 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -291,13 +292,34 @@ namespace BackgroundChanger.Controls
             }
             else
             {
-                string PathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
-                if (PathImage.IsNullOrEmpty())
+                string pathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
+                if (pathImage.IsNullOrEmpty())
                 {
-                    PathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
+                    pathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
                 }
 
+                if (!(PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage == true && PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage <= 0))
+                {
+                    SetBackgroundImage(pathImage);
+                }
+                else
+                {
+
+                }
+            }
+
+            string PathImage = ImageSourceManager.GetImagePath(GameContext.BackgroundImage);
+            if (PathImage.IsNullOrEmpty())
+            {
+                PathImage = API.Instance.Database.GetFullFilePath(GameContext.BackgroundImage);
+            }
+            if (!(PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage == true && PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage <= 0))
+            {
                 SetBackgroundImage(PathImage);
+            }
+            else
+            {
+
             }
 
             if (PluginDatabase.PluginSettings.Settings.useVideoDelayBackgroundImage)
@@ -307,7 +329,7 @@ namespace BackgroundChanger.Controls
                     Thread.Sleep(1000 * PluginDatabase.PluginSettings.Settings.videoDelayBackgroundImage);
                     _ = Application.Current.Dispatcher?.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                     {
-                        string PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
+                        PathImage = gameBackgroundImages?.ItemsBackground?.Where(x => x.IsVideo)?.OrderBy(x => x.IsFavorite)?.FirstOrDefault()?.FullPath;
                         SetBackgroundImage(PathImage);
                     }));
                 });
